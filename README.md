@@ -32,13 +32,18 @@ nvcc compare.cu naive_kernels.cu flash_kernels.cu -o compare
 ./compare
 ```
 
-## Next steps
+## Profiling results
 
-The next step is to profile both implementations and compare:
+DRAM traffic was measured on a 3090 Ti using NVIDIA Nsight Compute:
 
-- Kernel execution time
-- Global memory traffic
-- Memory bandwidth
-- Shared-memory usage
+```bash
+sudo ncu --metrics dram__bytes_read.sum,dram__bytes_write.sum ./naive
+sudo ncu --metrics dram__bytes_read.sum,dram__bytes_write.sum ./flash
+```
 
-Performance results will be added after profiling.
+| Implementation | Reads | Writes | Total |
+| --- | ---: | ---: | ---: |
+| Naive | 9.21 MB | 4.57 MB | 13.78 MB |
+| FlashAttention | 0.80 MB | 0.055 MB | 0.855 MB |
+
+The naive totals include all three kernels. The FlashAttention implementation uses approximately 16.1x less DRAM traffic.
